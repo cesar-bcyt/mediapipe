@@ -44,7 +44,10 @@ SUBDIR_INIT_PY_FILES = [
     os.path.join(MP_ROOT_PATH, 'mediapipe/modules/__init__.py'),
     os.path.join(MP_ROOT_PATH,
                  'mediapipe/modules/holistic_landmark/__init__.py'),
-    os.path.join(MP_ROOT_PATH, 'mediapipe/modules/objectron/__init__.py')
+    os.path.join(MP_ROOT_PATH, 'mediapipe/modules/objectron/__init__.py'),
+    os.path.join(MP_ROOT_PATH, 'mediapipe/graphs/__init__.py'),
+    os.path.join(MP_ROOT_PATH, 'mediapipe/graphs/iris_tracking/__init__.py'),
+    os.path.join(MP_ROOT_PATH, 'mediapipe/graphs/iris_tracking/calculators__init__.py')
 ]
 if not os.path.exists(ROOT_INIT_PY):
   open(ROOT_INIT_PY, 'w').close()
@@ -179,7 +182,7 @@ class GeneratePyProtos(setuptools.Command):
     for pattern in [
         'mediapipe/framework/**/*.proto', 'mediapipe/calculators/**/*.proto',
         'mediapipe/gpu/**/*.proto', 'mediapipe/modules/**/*.proto',
-        'mediapipe/util/**/*.proto'
+        'mediapipe/util/**/*.proto', 'mediapipe/graphs/iris_tracking/calculators/*.proto'
     ]:
       for proto_file in glob.glob(pattern, recursive=True):
         proto_dir = os.path.dirname(os.path.abspath(proto_file))
@@ -234,6 +237,20 @@ class BuildBinaryGraphs(build.build):
       sys.stderr.write('generating binarypb: %s\n' %
                        os.path.join('mediapipe/modules/', binary_graph))
       self._generate_binary_graph(binary_graph)
+     
+    # iris graph
+    bazel_command = [
+        'bazel',
+        'build',
+        '--compilation_mode=opt',
+        '--define=MEDIAPIPE_DISABLE_GPU=1',
+        '--action_env=PYTHON_BIN_PATH=' + _normalize_path(sys.executable),
+        'mediapipe/graphs/iris_tracking/iris_tracking_cpu_binary_graph',
+    ]
+    output_name = 'iris_tracking/iris_tracking_cpu.binarypb'
+    output_file = os.path.join('mediapipe/graphs', output_name)
+    shutil.copyfile(
+        os.path.join('bazel-bin/mediapipe/graphs/', output_name), output_file)
 
   def _generate_binary_graph(self, graph_path):
     """Generate binary graph for a particular MediaPipe binary graph target."""
