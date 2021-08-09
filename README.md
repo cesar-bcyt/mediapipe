@@ -4,7 +4,7 @@ Versión parchada de [Mediapipe](https://github.com/google/mediapipe) que incorp
 
 ### Uso
 
-Después de compilar Mediapipe usando [estas instrucciones](https://google.github.io/mediapipe/getting_started/python#building-mediapipe-python-package), la API se puede usar así:
+Después de compilar Mediapipe siguiendo [estas instrucciones](https://google.github.io/mediapipe/getting_started/python#building-mediapipe-python-package), la API se puede usar así:
 
 ```python
 import mediapipe as mp
